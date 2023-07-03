@@ -41,7 +41,7 @@ accelerate launch run_wav2vec2_pretraining_no_trainer.py \
 
 
 if this runs, the next goal is to replace the librispeech_asr named datasource and replace it with other
-acoustic wav files.
+acoustic wav files.  This will probably use the AudioFolder builder
 
 # Whisper
 https://arxiv.org/pdf/2212.04356.pdf
