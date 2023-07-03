@@ -8,3 +8,4 @@ Goal is to duplicate training the pretrained model using non-speech data.
 
 # Whisper
 https://arxiv.org/pdf/2212.04356.pdf
+
