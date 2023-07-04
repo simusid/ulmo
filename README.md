@@ -4,6 +4,7 @@ Tools and resources to build and test a Large Acoustics Model (LAM)
 # Wav2Vec2
 * https://github.com/facebookresearch/fairseq/tree/main/examples/wav2vec#wav2vec-20
 * https://jonathanbgn.com/2021/09/30/illustrated-wav2vec-2.html
+  
 Goal is to duplicate training the pretrained model using non-speech data.
 
 The key concept from the original paper:
