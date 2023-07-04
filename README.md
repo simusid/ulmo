@@ -5,6 +5,15 @@ Tools and resources to build and test a Large Acoustics Model (LAM)
 https://github.com/facebookresearch/fairseq/tree/main/examples/wav2vec#wav2vec-20
 Goal is to duplicate training the pretrained model using non-speech data.
 
+The key concept from the original paper:
+> learning powerful representations from speech audio alone followed by fine-tuning on transcribed speech can outperform the best semi-supervised methods while being conceptually simpler. wav2vec 2.0 masks the speech input in the latent space and solves a contrastive task defined over a quantization of the latent representations which are jointly learned.
+
+
+## Transformer documentation
+https://huggingface.co/docs/transformers/v4.30.0/en/model_doc/wav2vec2
+
+
+
 ## Running Wav2Vec2
 
 Pull huggingface/transformer repo.  Then cd to examples/pytorch/speech-pretraining.
