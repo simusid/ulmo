@@ -20,11 +20,11 @@ N = 12500 # number of files
 print("processing {} files".format(N))
 
 SECONDS = 10  # wav2vec2 preprocessor has min/max limits 
-RAW_WAV = "raw_wavs"   # output directory for segments
-NEW_DATASET = "/mnt/md0/NEW_DATASET"
-GENRAW = False
+RAW_WAV = "hammer_wavs"   # output directory for segments
+NEW_DATASET = "/mnt/md0/HAMMER_DATASET"
+GENRAW = True
 
-fnames = glob("/mnt/md0/birds*/train*/**/*mp3")
+fnames = glob("/mnt/md0/hammersounds/*wav")
 random.shuffle(fnames) 
 assert len(fnames)>0
 if(GENRAW==True):
