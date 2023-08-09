@@ -59,3 +59,8 @@ TODO:   see build_dataset.py script
 # Whisper
 https://arxiv.org/pdf/2212.04356.pdf
 
+# Additional References
+[NOAA Passive Acoustic Data](https://www.ncei.noaa.gov/products/passive-acoustic-data)
+
+[NOAA AI For Whale Sounds](https://www.ncei.noaa.gov/news/using-ai-listen-and-learn-about-humpback-whales)
+
