@@ -58,6 +58,10 @@ TODO:   see build_dataset.py script
 
 # Whisper
 https://arxiv.org/pdf/2212.04356.pdf
+# huBERT
+[huBERT](https://arxiv.org/abs/2106.07447)
+
+[MERT](https://github.com/yizhilll/MERT)
 
 # Additional References
 [NOAA Passive Acoustic Data](https://www.ncei.noaa.gov/products/passive-acoustic-data)
