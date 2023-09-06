@@ -68,3 +68,4 @@ https://arxiv.org/pdf/2212.04356.pdf
 
 [NOAA AI For Whale Sounds](https://www.ncei.noaa.gov/news/using-ai-listen-and-learn-about-humpback-whales)
 
+[AudoMAE](https://github.com/facebookresearch/AudioMAE)
