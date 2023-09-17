@@ -1,72 +1,72 @@
 \documentclass[twocolumn]{article}
 
-% Packages for formatting and graphics
-\usepackage{graphicx}
-\usepackage{lipsum} % Placeholder text
+% Preamble
+\usepackage{lipsum} % For generating dummy text
+\usepackage{graphicx} % For including figures
+\usepackage{authblk} % For author affiliations
 
-% Title and author information
-\title{Building a Large Acoustics Model}
+% Title and authors
+\title{Investigation of Self Supervised Learning with Passive Acoustic Data}
 \author{Gary Huntress}
-\date{} % Remove date
 
-% Begin the document
+\affil{NUWCDIVNPT, Code 4542}
+
 \begin{document}
 
-% Title section
 \maketitle
 
-% Abstract
-\section*{Abstract}
-\lipsum[1] % Replace with your abstract text
+\begin{abstract}
+Preliminary investigation of the viability to use self supervised learning (SSL) with acoustic data.  SSL is used to pre-train a foundational model such that it learns common features of the data.  A corpus of passive acoustic data was obtained from NOAA.  A very simple SSL "pretext" task was defined.  The model was trained, validated, and tested on a subset of the NOAA data.  ROC/AUC testing demonstrated the sucess of the approach.  To ensure that the features learned during SSL testing were not specific to the original data (specific to time/location), a second set of passive acoustic "Gold" data was tested (no additional training).  ROC/AUC results were equally successful.
+\end{abstract}
 
-% Introduction
 \section{Introduction}
-\lipsum[2-3] % Replace with your introduction text
+There are many techniques and approaches that can be used for successful machine learning.  One of the most successful approaches is Supervised Classification.  A common example is to assign a label (e.g. "cat", "dog") to an object in an image.  In order to be successful, an ML model requires a large amount of pre-labeled images.  A major drawback of Supervised Classification is that labeling commonly requires human effort and this is expensive.   
+\subsection{Self Supervised Classification (SSL)}
+SSL is a method to train a model on a "pretext" task.  This is done in a supervised fashion using unlabled rather than labeled data.   Pretext labels are derived from the data itself rather than an after a human review.  These labels are in essence "free".
+ 
+\section{Data}
+NOAA\cite{example1} maintains a public archive of passive acoustic data.  The data files vary in both temporal and geographic locations.  The data is known to include many acoustic features such as multiple whale species, shipping, sonar, explosions, and varied background noise.  Each data file is approximately 3 hours in duration with a sample rate of 96KHz.   It is not feasible to obtain the entire 400+ TB archive.  The primary dataset used for experimentation is the CIO1 subset of the "Sanctuary Sound" archive.  Data was collected off the north coast of Santa Rosa Island CA across multiple months.  Approximately 3000 data files (9000 hours) were obtained.   
 
-% Methodology
+Each raw file is decomposed into "clips" approximately 10 seconds in duration.  
+
 \section{Methodology}
-\lipsum[4-5] % Replace with your methodology text
+In order to train an SSL model, a "pretext" task is defined that leverages the unlabled data on hand (the acoustic time series) to produce usable pseudo labels inherent in the data itself.  The proxy task used was as follows:
 
-% Results
+\begin{itemize}
+\item Select hyperparameter for the length of the sub-clip N 
+\item Draw two random audio clips A and B
+\item Draw two random index values
+\item Produce subclips A[idx:idx+N] and B[idx:idx+N]
+\item Flip a coin to produce a third clip X derived from either A or B
+\item Train the model on this supervised [ABX] input and the known coin flip choice.
+\end{itemize}
+
+A simple 4 layer dense network was built with Keras.  The model has a single sigmoid output.  Dropout was used to provide minimal regularization.  The model consisted of approximately 2.5M parameters.   The model was trained until terminated by EarlyStopping.
+
 \section{Results}
-\lipsum[6-7] % Replace with your results text
+Present your research findings and results here.
 
-% Discussion
 \section{Discussion}
-\lipsum[8-9] % Replace with your discussion text
+It trained and validated well.
+It tested well on /test data.
+It tested well on GOLD data.
+Show improvement over each epoch
 
-% Conclusion
 \section{Conclusion}
-\lipsum[10] % Replace with your conclusion text
+There is every indidation that this model has learned sufficient acoustic features.  This approach may be extensively broadened to include orders of magnitude more data, more complex models (e.g. 1D CNN).
 
-% Acknowledgments
-\section*{Acknowledgments}
-\lipsum[11] % Replace with your acknowledgments text
+% Example of including a figure
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{image1.jpg}
+    \caption{Example Figure}
+    \label{fig:example}
+\end{figure}
 
-% References
+% Example of citing references
 \begin{thebibliography}{9}
-% Include your references here
+\bibitem{example1} NOAA Passive Acoustic Dataset https://www.ncei.noaa.gov/products/passive-acoustic-data
+\bibitem{example2} Discussion of Self Supervised Learning https://arxiv.org/abs/2304.12210
 \end{thebibliography}
 
-% Appendices (if any)
-\appendix
-\section{Appendix A}
-\lipsum[12] % Replace with your appendix text
-
-% Include images
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{image1.jpg}
-  \caption{Description of Image 1}
-  \label{fig:image1}
-\end{figure}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{image2.jpg}
-  \caption{Description of Image 2}
-  \label{fig:image2}
-\end{figure}
-
-% End the document
 \end{document}
