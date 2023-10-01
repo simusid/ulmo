@@ -29,6 +29,10 @@ NOAA\cite{example1} maintains a public archive of passive acoustic data.  The da
 
 Each raw file is decomposed into "clips" approximately 10 seconds in duration.  
 
+As a proof of concept a train/test split was produced of 15k and 15000 files.
+
+
+
 \section{Methodology}
 In order to train an SSL model, a "pretext" task is defined that leverages the unlabled data on hand (the acoustic time series) to produce usable pseudo labels inherent in the data itself.  The proxy task used was as follows:
 
