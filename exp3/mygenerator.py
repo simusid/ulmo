@@ -16,6 +16,10 @@ class MyGenerator(Sequence):
     def __len__(self):
         return math.ceil(len(self.fnames) / self.batch_size)
     
+    def rescale(self, x):
+        return -1 + 2 * (x - x.min()) / (x.max() - x.min())
+        
+    
     def getClip(self, fnames):
         while True:
             f = random.choice(fnames)
@@ -25,9 +29,10 @@ class MyGenerator(Sequence):
                 clip1 = x[idx:idx+self.N]
                 idx = random.choice(list(range(0, x.shape[0]-self.N) ))
                 clip2 = x[idx:idx + self.N]
-                clip1 = self.transform(clip1, sample_rate=self.SR)
-                clip2 = self.transform(clip2, sample_rate=self.SR)
-                
+                #clip1 = self.transform(clip1, sample_rate=self.SR)
+                #clip2 = self.transform(clip2, sample_rate=self.SR)
+                clip1 = self.rescale(clip1)
+                clip2 = self.rescale(clip2)
                 didx = random.choice(list(range(clip1.shape[0]-self.DROPOUT)))
                 clip1[didx:didx+self.DROPOUT]=0
                 didx = random.choice(list(range(clip2.shape[0]-self.DROPOUT)))
