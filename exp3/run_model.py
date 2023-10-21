@@ -24,7 +24,7 @@ fnames = glob(ROOT+ "clips/train/*npy")
 testnames = glob(ROOT+ 'clips/test/*npy')
  
 mygen = MyGenerator( fnames, N=N, dropout=DROPOUT, sr=SR)
-testgen = MyGenerator( testnames )
+testgen = MyGenerator( testnames, N=N, dropout=DROPOUT, sr=SR )
 
 checkpoint =ModelCheckpoint(ROOT + "best_{epoch}", save_best=False)
  
@@ -58,4 +58,4 @@ model.summary()
 
 model.fit(mygen, validation_data=testgen, 
                  validation_steps=10,  
-                 batch_size=32, epochs=50, callbacks=[checkpoint] )
+                 batch_size=256, epochs=50, callbacks=[checkpoint] )
