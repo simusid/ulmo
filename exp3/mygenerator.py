@@ -2,63 +2,59 @@ from tensorflow.keras.utils import Sequence
 import math
 import random
 import numpy as np
-
-from audiomentations import Compose, Normalize, Gain
- 
-transform1 = Compose([Normalize(p=1.0)])
-transform2 = Compose([ Gain(min_gain_in_db=-6, max_gain_in_db=6, p=1.0)])
-
-
-def getbrokenfile(fnames):
-    while True:
-        f = random.choice(fnames)
-        x = np.load(f)
-        if(x.shape[0]==1_000_000):
-            return x
-        else:
-            pass
-        
-        
+from audiomentations import Compose, Normalize, Gain    
         
 class MyGenerator(Sequence):
-    def __init__(self, fnames, batch_size=64, N=2048):
+    def __init__(self, fnames, batch_size=64, N=2048, dropout=500, sr=96000):
         self.fnames = fnames
         self.batch_size= 64
         self.N = N
+        self.SR = sr
+        self.DROPOUT = dropout
+        self.transform = Compose([Normalize( p=1.0 )])
         
     def __len__(self):
         return math.ceil(len(self.fnames) / self.batch_size)
     
+    def getClip(self, fnames):
+        while True:
+            f = random.choice(fnames)
+            x = np.load(f)
+            if(x.shape[0]==1_000_000):
+                idx = random.choice(list(range(0, x.shape[0]-self.N) ))
+                clip1 = x[idx:idx+self.N]
+                idx = random.choice(list(range(0, x.shape[0]-self.N) ))
+                clip2 = x[idx:idx + self.N]
+                clip1 = self.transform(clip1, sample_rate=self.SR)
+                clip2 = self.transform(clip2, sample_rate=self.SR)
+                
+                didx = random.choice(list(range(clip1.shape[0]-self.DROPOUT)))
+                clip1[didx:didx+self.DROPOUT]=0
+                didx = random.choice(list(range(clip2.shape[0]-self.DROPOUT)))
+                clip2[didx:didx+self.DROPOUT]=0
+                
+                return clip1, clip2
+            else:
+                pass
+ 
     def __getitem__(self, idx):
         x_train = []
         y_train = []
         for i in range(self.batch_size):
-            a = getbrokenfile(self.fnames)
-            #a = transform2(transform1(a, sample_rate=96000), sample_rate=96000)
-            a =  transform1(a, sample_rate=96000) 
-            idx = random.choice(list(range(0, a.shape[0]-self.N) ))
-            aa = a[idx:idx+self.N]
-            b = getbrokenfile(self.fnames)
-            #b = transform2(transform1(b, sample_rate=96000), sample_rate=96000)
-            b =  transform1(b, sample_rate=96000) 
- 
-            idx = random.choice(list(range(0, b.shape[0]-self.N )))
-            bb = b[idx:idx+self.N]
-            
+            a, ca = self.getClip(self.fnames)
+            b, cb = self.getClip(self.fnames)
+    
             choice = random.choice([0,1])
             y_train.append(choice)
-            
-            # now pick unknown
-            idx = random.choice(list(range(0, a.shape[0]-self.N )))
+             
             if(choice==0):
                 #source is A
-                clip = a[idx:idx+self.N]
+                clip = ca
             else:
-                clip = b[idx:idx+self.N]
+                clip = cb
             assert len(clip)==self.N
-            clip=  transform1(clip, sample_rate=96000) 
- 
-            x_train.append(np.hstack([aa,bb,clip]))
+            x_train.append(np.hstack([a,b,clip]))
+    
         x_train = np.array(x_train)
         x_train = np.expand_dims(x_train,-1)  # add for conv network
         y_train = np.array(y_train)
