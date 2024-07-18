@@ -1,3 +1,5 @@
+# reference https://llama.meta.com/docs/how-to-guides/fine-tuning/
+# for details on various methods.    PEFT is recommended.t
 import json
 from datasets import Dataset
 from transformers import (
