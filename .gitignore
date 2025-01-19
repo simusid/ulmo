@@ -3,6 +3,9 @@
 *.jpeg
 *.png
 
+# output of experiments, similar to YOLOV5
+runs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

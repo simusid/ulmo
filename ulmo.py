@@ -25,7 +25,10 @@ parser.add_argument("--ff_dim", default=512, type=int, help="Feed forward dimens
 parser.add_argument("--sequence_length", default=50, type=int, help="Sequence length")
 args = parser.parse_args()
 
-print(args.source  )
+from experiments import ExperimentManager
+manager = ExperimentManager()
+manager.new()
+exit()
 
 logging.basicConfig(level=logging.INFO, filename='lam.log')
 logger = logging.getLogger()
@@ -33,7 +36,7 @@ logger.info("Starting LAM")
 
 fnames = glob(args.source )
 random.shuffle(fnames)
- 
+fnames = fnames[:900]
 grams = MultiChannelGrams(fnames[0], args.channel, args.target_sr, args.n_mels, args.gram_width)   
 
 kmeans = LAM_KMeans(grams.grams, vocabulary_size=args.kmeans_vocabulary_size, 
@@ -70,8 +73,7 @@ for t in tokens:
         y.append( t[i+N])
 x = np.array(x)
 y = np.array(y)
-
-lam = LAM(x,y)
+lam = LAM(x, y, sequence_length=args.sequence_length)
 lam.build()
 lam.train()
 
