@@ -29,6 +29,7 @@ from experiments import ExperimentManager
 manager = ExperimentManager()
 manager.new()
 exit()
+#snuh
 
 logging.basicConfig(level=logging.INFO, filename='lam.log')
 logger = logging.getLogger()
