@@ -11,7 +11,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["--source","/Users/gary/Downloads/birdsong-recognition/train_audio/**/*mp3",
+            "args": ["--source","/Users/gary/Downloads/birdsong-recognition/train_audio",
         "--kmeans_vocabulary_size","200",
         "--tokenizer_vocabulary_size","200",
         "--target_sr","6000",

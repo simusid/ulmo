@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import logging
 from tqdm import tqdm 
 from argparse import ArgumentParser
-
+from pathlib import Path 
+from experiments import ExperimentManager
 
 parser = ArgumentParser()
 parser.add_argument("--source", type=str, help="Path to the audio files")   
@@ -25,33 +26,33 @@ parser.add_argument("--ff_dim", default=512, type=int, help="Feed forward dimens
 parser.add_argument("--sequence_length", default=50, type=int, help="Sequence length")
 args = parser.parse_args()
 
-from experiments import ExperimentManager
 manager = ExperimentManager()
-manager.new()
-exit()
-#snuh
-
+exp_path = manager.new()
+ 
 logging.basicConfig(level=logging.INFO, filename='lam.log')
 logger = logging.getLogger()
 logger.info("Starting LAM")
 
-fnames = glob(args.source )
-random.shuffle(fnames)
-fnames = fnames[:900]
+path = Path(args.source)
+fnames = list(path.rglob("*.mp3") )+ list(path.rglob("*.wav"))
+logger.info(f"Found {len(fnames)} audio files")
+
+# create grams from the first file and fit a kmeans model 
 grams = MultiChannelGrams(fnames[0], args.channel, args.target_sr, args.n_mels, args.gram_width)   
 
 kmeans = LAM_KMeans(grams.grams, vocabulary_size=args.kmeans_vocabulary_size, 
     reduce_dims=args.reduce_dims, 
     umap_components=args.umap_components) 
- 
-for f in tqdm(fnames):
+
+# now load and train the rest of the files with partial_fit
+for f in tqdm(fnames[1:]):
     try:
         grams=MultiChannelGrams(f, args.channel, args.target_sr, args.n_mels, args.gram_width).grams
         kmeans.partial_fit(grams)
     except Exception as e:
         logger.error(f"Error processing {f}: {e}")
         continue
-kmeans
+ 
 labels = []
 for f in tqdm(fnames):
     grams = MultiChannelGrams(f, args.channel, args.target_sr, args.n_mels, args.gram_width).grams
@@ -78,10 +79,8 @@ lam = LAM(x, y, sequence_length=args.sequence_length)
 lam.build()
 lam.train()
 
-
-#model = LAM_Model(tokenizer, args.embedding_dim, args.num_heads, args.num_transformer_blocks, args.ff_dim)
-#model.train(x, y, args.epochs)
-#model.evaluate()
+plt.plot(lam.history.history['loss'])
+plt.savefig(exp_path + "/loss.png")
 
 plt.hist(y, bins=tokenizer.vocab_size)
-plt.show()
+plt.savefig(exp_path + "/hist.png")
