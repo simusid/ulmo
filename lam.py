@@ -13,6 +13,8 @@ from scipy.io import wavfile
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import EarlyStopping
 
 from tokenizers import Tokenizer
 from tokenizers.models import BPE
@@ -40,11 +42,12 @@ class TokenAndPositionEmbedding(layers.Layer):
         return x + positions
         
 class LAM():
-    def __init__(self, epochs = 12, num_heads=4, num_transformer_blocks=2, ff_dim=512, embedding_dim=128):
+    def __init__(self, x,y, epochs = 12, num_heads=4, num_transformer_blocks=2, 
+                ff_dim=512, sequence_length=50, embedding_dim=128, tokenizer_vocab_size=200):
         # Parameters
         # TODO - don't hard code sequence length
-        self.vocab_size = TOKENIZER_VOCAB_SIZE         # Size of the token vocabulary
-        self.sequence_length = 50                      # Length of input sequences  originally 20
+        self.vocab_size = tokenizer_vocab_size         # Size of the token vocabulary
+        self.sequence_length = sequence_length         # Length of input sequences  originally 20
         self.embedding_dim = embedding_dim             # Dimension of token embeddings originally 128
         self.num_heads = num_heads                     # Number of attention heads   (originally 4)
         self.ff_dim = ff_dim                           # Dimension of feedforward network  (originally 512)
@@ -52,6 +55,8 @@ class LAM():
         self.num_transformer_blocks = num_transformer_blocks  # Number of transformer blocks originally 2
         self.batch_size = 256                          # Batch size for training
         self.epochs =  epochs                          # Number of training epochs
+        self.x_train = x
+        self.y_train = y
 
     def transformer_block(self, inputs, embedding_dim, num_heads, ff_dim, dropout_rate):
         # Multi-head Self-Attention
@@ -97,17 +102,17 @@ class LAM():
         self.model.compile( optimizer=adam, loss="sparse_categorical_crossentropy", metrics=["accuracy"])
 
         # TODO - Fix data source, and Train/test split
-        # 
-        x_all, y_all = pkl.load(open(X_Y_FILE, 'rb'))
-        x_all= np.array(x_all)
-        y_all =np.array(y_all)
+        
+        x_all= self.x_train
+        y_all =self.y_train
+
         idx = int(x_all.shape[0]*.9)
         x_train = x_all[:idx,:]
         y_train = y_all[:idx]
         x_test  = x_all[idx:,:]
         y_test  = y_all[idx:]
-        self.history = self.model.fit(x_train, y_train, epochs = lam.epochs, callbacks=[es],
-                                    batch_size = lam.batch_size, validation_split=.15, )
+        self.history = self.model.fit(x_train, y_train, epochs = self.epochs, callbacks=[es],
+                                    batch_size = self.batch_size, validation_split=.15, )
         self.model.evaluate(x_test, y_test)
 
     def evaluate(self):
@@ -117,7 +122,7 @@ class LAM():
 class MultiChannelGrams():
     def __init__(self, fname, channel = 0, target_sr= 8000, n_mels=256, gram_width=32):
         self.fname=fname
-        self.WIDTH=gram_width
+        self.gram_width=gram_width
         self.n_mels = n_mels
         self.target_sr = target_sr
         self.channel = channel
@@ -131,8 +136,8 @@ class MultiChannelGrams():
         Sxx = np.log(np.abs(y))
         Sxx = Sxx - Sxx.min()
         Sxx = Sxx/Sxx.max()
-        for i in range(0, Sxx.shape[1] - 256, 64):
-            grams.append(Sxx[:, i:i+self.WIDTH])
+        for i in range(0, Sxx.shape[1] - self.gram_width, self.gram_width//2):
+            grams.append(Sxx[:, i:i+self.gram_width])
         return grams, Sxx
     
     # passed a multichannel time series file
@@ -165,6 +170,7 @@ class LAM_KMeans():
             features = np.vstack([g.ravel() for g in grams])
             if(self.REDUCE_DIMS==True):
                 features= self.doReduceDim(features)
+            
             self.model.fit(features)
         # self.kmeans.partial_fit(features[1000:23000])
         
@@ -212,5 +218,6 @@ class LAM_Tokenizer():
             labels = self.kmeans.predict(grams)   # step 2 use trained kmeans model to map gram to label
             labels_as_string = " ".join(map(str, labels))  
             return self.tokenizer.encode(" ".join(map(str, labels_as_string))).ids  # step 3 convert labels to tokens
-        except:
+        except Exception as e:
+            print("cannot tokenize file", f, e)
             return []

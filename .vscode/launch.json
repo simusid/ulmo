@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        { 
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["--source","/Users/gary/Downloads/birdsong-recognition/train_audio/**/*mp3",
+        "--kmeans_vocabulary_size","200",
+        "--tokenizer_vocabulary_size","200",
+        "--target_sr","6000",
+        "--num_heads","6",
+        "--num_transformer_blocks","2",
+        "--ff_dim","1024",
+        "--embedding_dim", "384",
+        
+        "--umap_components","200", 
+        "--sequence_length", "30",
+    ]
+        }
+    ]
+}
