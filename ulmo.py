@@ -24,18 +24,23 @@ parser.add_argument("--num_heads", type=int, default=4, help="Number of heads")
 parser.add_argument("--num_transformer_blocks", default=2, type=int, help="Number of transformer blocks")
 parser.add_argument("--ff_dim", default=512, type=int, help="Feed forward dimension")
 parser.add_argument("--sequence_length", default=50, type=int, help="Sequence length")
+parser.add_argument("--max_files", default=1000, type=int, help="Maximum number of files to process")
 args = parser.parse_args()
 
-manager = ExperimentManager()
+manager = ExperimentManager()  # create new directory for experiment 
 exp_path = manager.new()
  
 logging.basicConfig(level=logging.INFO, filename='lam.log')
 logger = logging.getLogger()
 logger.info("Starting LAM")
 
-path = Path(args.source)
+path = Path(args.source)   # 
 fnames = list(path.rglob("*.mp3") )+ list(path.rglob("*.wav"))
+fnames = [str(f) for f in fnames]
+random.shuffle(fnames)
 logger.info(f"Found {len(fnames)} audio files")
+fnames = random.sample(fnames, args.max_files)
+logger.info(f"limited to: {len(fnames)} audio files")
 
 # create grams from the first file and fit a kmeans model 
 grams = MultiChannelGrams(fnames[0], args.channel, args.target_sr, args.n_mels, args.gram_width)   
@@ -44,7 +49,7 @@ kmeans = LAM_KMeans(grams.grams, vocabulary_size=args.kmeans_vocabulary_size,
     reduce_dims=args.reduce_dims, 
     umap_components=args.umap_components) 
 
-# now load and train the rest of the files with partial_fit
+# now load and train the rest of the files with partial_fi
 for f in tqdm(fnames[1:]):
     try:
         grams=MultiChannelGrams(f, args.channel, args.target_sr, args.n_mels, args.gram_width).grams
