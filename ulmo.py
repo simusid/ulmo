@@ -34,6 +34,10 @@ logging.basicConfig(level=logging.INFO, filename=f'{exp_path}/lam.log')
 logger = logging.getLogger()
 logger.info("Starting LAM")
 logger.info(note)
+logger.info(f"KMeans vocabulary size: {args.kmeans_vocabulary_size}")
+logger.info(f"Tokenizer vocabulary size: {args.tokenizer_vocabulary_size}")
+logger.info(f"sequence length: {args.sequence_length}")
+
 
 path = Path(args.source)   # 
 fnames = list(path.rglob("*.mp3") )+ list(path.rglob("*.wav"))
@@ -54,6 +58,14 @@ kmeans = LAM_KMeans(grams.grams, vocabulary_size=args.kmeans_vocabulary_size,
 # now load and train the rest of the files with partial_fit
 for f in tqdm(fnames[1:]):
     try:
+        grams=MultiChannelGrams(f, args.channel, args.target_sr, args.n_mels, args.gram_width).grams
+        kmeans.partial_fit(grams)
+        #augment 10% higher
+        aug_sr = args.target_sr*1.1
+        grams=MultiChannelGrams(f, args.channel, args.target_sr, args.n_mels, args.gram_width).grams
+        kmeans.partial_fit(grams)
+        #augment 10% lower
+        aug_sr = args.target_sr*.9
         grams=MultiChannelGrams(f, args.channel, args.target_sr, args.n_mels, args.gram_width).grams
         kmeans.partial_fit(grams)
     except Exception as e:
@@ -90,8 +102,20 @@ lam = LAM(x, y, sequence_length=args.sequence_length)
 lam.build()
 lam.train()
 
+# this belongs in an Assessments class
+def histogram_metric(data, bins=10):
+    counts, bin_edges = np.histogram(data, bins='auto')
+    most_values = np.max(counts)
+    total_counts = np.sum(counts)
+    metric = most_values / total_counts if total_counts > 0 else 0
+    return metric
+
 plt.plot(lam.history.history['loss'])
+plt.title("Loss")
+plt.grid()
 plt.savefig(exp_path + "/loss.png")
 
 plt.hist(y, bins=tokenizer.vocab_size)
-plt.savefig(exp_path + "/hist.png")
+plt.title(f"Next Token Distribution - {histogram_metric(y)}")
+plt.grid()
+plt.savefig(exp_path + "/next_token.png")
