@@ -22,7 +22,7 @@
         
         "--umap_components","200", 
         "--sequence_length", "30",
-        "--max_files", "100",
+        "--max_files", "10",
     ]
         }
     ]

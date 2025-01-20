@@ -78,8 +78,12 @@ for t in tokens:
     for i in range(0, len(t)-N-1, N):
         x.append(t[i:i+N])
         y.append( t[i+N])
+assert len(x)==len(y)
+assert len(x)>0
+
 x = np.array(x)
 y = np.array(y)
+print(x.shape, y.shape)
 lam = LAM(x, y, sequence_length=args.sequence_length)
 lam.build()
 lam.train()
