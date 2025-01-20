@@ -145,11 +145,11 @@ class MultiChannelGrams():
     def makeGrams(self):
         if(self.fname.endswith(".mp3")):
             x, sr = librosa.load(self.fname, sr=self.target_sr)
-            if(len(x.shape)==1):
-                x = np.expand_dims(x, axis=1)
         else:
             sr, x = wavfile.read(self.fname)    # default padres samping rate is 80,000
         # process only one channel
+        if(len(x.shape)==1):
+            x = np.expand_dims(x, axis=1)
         x = x[:, self.channel]
         x= x-x.min()
         x= x/x.max()

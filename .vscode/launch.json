@@ -11,18 +11,18 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["--source","/Users/gary/Downloads/birdsong-recognition/train_audio",
+            "args": ["--source","/Users/gary/Downloads/shipsEar_AUDIOS",
         "--kmeans_vocabulary_size","40",
         "--tokenizer_vocabulary_size","40",
-        "--target_sr","10000",
-        "--num_heads","4",
+        "--target_sr","22050",
+        "--num_heads","6",
         "--num_transformer_blocks","2",
         "--ff_dim","512",
         "--embedding_dim", "384",
         
         "--umap_components","200", 
-        "--sequence_length", "30",
-        "--max_files", "10",
+        "--sequence_length", "100",
+        "--max_files", "90",
     ]
         }
     ]

@@ -29,10 +29,11 @@ args = parser.parse_args()
 
 manager = ExperimentManager()  # create new directory for experiment 
 exp_path = manager.new()
- 
-logging.basicConfig(level=logging.INFO, filename='lam.log')
+note = input("Enter a note for this experiment: ")
+logging.basicConfig(level=logging.INFO, filename=f'{exp_path}/lam.log')
 logger = logging.getLogger()
 logger.info("Starting LAM")
+logger.info(note)
 
 path = Path(args.source)   # 
 fnames = list(path.rglob("*.mp3") )+ list(path.rglob("*.wav"))
@@ -50,7 +51,7 @@ kmeans = LAM_KMeans(grams.grams, vocabulary_size=args.kmeans_vocabulary_size,
     reduce_dims=args.reduce_dims, 
     umap_components=args.umap_components) 
 
-# now load and train the rest of the files with partial_fi
+# now load and train the rest of the files with partial_fit
 for f in tqdm(fnames[1:]):
     try:
         grams=MultiChannelGrams(f, args.channel, args.target_sr, args.n_mels, args.gram_width).grams
