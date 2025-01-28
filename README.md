@@ -8,3 +8,4 @@ Large acoustic models
 - adding an <UNK> token 
 - Try a denoising autoencoder in place of kmeans to create labels.
 - Data augmentation by using sets of spectrogram parameters (vary SR +- 10%)
+- methods of self supervision such as SimCLR, wav2vec2,and BYOL
