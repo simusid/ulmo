@@ -69,7 +69,7 @@ class WavDataset(torch.utils.data.Dataset):
 # -------------------------------------
 # 2. Instantiate the Dataset
 # -------------------------------------
-audio_directory = "/Users/gary/Downloads/birdsong-recognition/train_audio/amerob/"  # Change to your path
+audio_directory = "/home/gary/Downloads/birdsong-recognition/train_audio/amerob/"  # Change to your path
 dataset = WavDataset(audio_directory, target_sample_rate=16000, segment_length=5)
 
 # -------------------------------------
